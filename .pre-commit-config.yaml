@@ -1,0 +1,20 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+    -   id: black
+-   repo: https://github.com/python-poetry/poetry
+    rev: '1.6.0'
+    hooks:
+    -   id: poetry-check
+        args: ["-C", "./app"]
+    -   id: poetry-lock
+        args: ["-C", "./app"]
+    -   id: poetry-export
+        args: ["-C", "./app", "-f", "requirements.txt", "-o", "./app/requirements.txt", "--without-hashes"]
