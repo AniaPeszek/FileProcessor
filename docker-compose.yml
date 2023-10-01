@@ -19,6 +19,17 @@ services:
       - ./.env.db
     ports:
       - "5432:5432"
+  pyspark_processor:
+    build:
+      context: ./pyspark_processor
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env.spark
+    depends_on:
+      - db
+    ports:
+      - "4040:4040"  # Spark UI port (if needed)
+      - "5001:5001"  # Flask API port
 
 volumes:
   postgres_data:

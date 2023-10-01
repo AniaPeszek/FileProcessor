@@ -14,6 +14,8 @@ ENV/
 env.bak/
 venv.bak/
 .env.db
+.env.spark
+poetry.lock
 
 # Unit test / coverage reports
 htmlcov/

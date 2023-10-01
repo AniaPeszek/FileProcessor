@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "file-processor"
+version = "0.1.0"
+description = "Python+Pyspark+Postgress application to store file metadata"
+authors = ["Anna <apeszek@gmail.com>"]
+readme = "README.md"
+packages = [{include = "app"}, {include = "pyspark_processor"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+psycopg2-binary = "^2.9.8"
+sqlalchemy = {version = "^2.0.21", optional = true}
+flask = {version = "^2.3.3", optional = true}
+pyspark = {version = "^3.5.0", optional = true}
+requests = {version = "^2.31.0", optional = true}
+pandas = {version = "^2.1.1", optional = true}
+
+[tool.poetry.extras]
+app = ["flask", "sqlalchemy", "requests"]
+pyspark_processor = ["pyspark", "flask", "sqlalchemy", "pandas"]
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

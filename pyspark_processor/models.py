@@ -6,22 +6,22 @@ Base = declarative_base()
 
 
 class FileType(str, Enum):
-    DLL = 'DLL'
-    EXE = 'EXE'
+    DLL = "DLL"
+    EXE = "EXE"
 
 
 class ArchitectureType(str, Enum):
-    x32 = 'x32'
-    x64 = 'x64'
+    x32 = "x32"
+    x64 = "x64"
 
 
 class MaliciousType(str, Enum):
-    malicious = 'malicious'
-    clean = 'clean'
+    malicious = "malicious"
+    clean = "clean"
 
 
 class FileMetadata(Base):
-    __tablename__ = 'files_metadata'
+    __tablename__ = "files_metadata"
 
     id = Column(Integer, primary_key=True)
     path = Column(String, nullable=False)
@@ -34,4 +34,4 @@ class FileMetadata(Base):
     malicious_type = Column(SQLAlchemyEnum(MaliciousType), nullable=False)
 
 
-hash_sum_index = Index('ix_hash_sum', FileMetadata.hash_sum)
+hash_sum_index = Index("ix_hash_sum", FileMetadata.hash_sum)
