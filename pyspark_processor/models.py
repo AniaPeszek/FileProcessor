@@ -1,4 +1,12 @@
 from enum import Enum
+
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    StringType,
+    IntegerType,
+    FloatType,
+)
 from sqlalchemy import Column, Integer, String, Float, Enum as SQLAlchemyEnum, Index
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -24,10 +32,10 @@ class FileMetadata(Base):
     __tablename__ = "files_metadata"
 
     id = Column(Integer, primary_key=True)
-    path = Column(String, nullable=False)
-    size = Column(Float, nullable=False)
+    path = Column(String, nullable=False, unique=True)
+    size = Column(Integer, nullable=False)
     type = Column(SQLAlchemyEnum(FileType), nullable=False)
-    architecture = Column(SQLAlchemyEnum(ArchitectureType), nullable=False)
+    architecture = Column(SQLAlchemyEnum(ArchitectureType), nullable=True)
     number_of_imports = Column(Integer, nullable=False)
     number_of_exports = Column(Integer, nullable=False)
     hash_sum = Column(String, nullable=False)
@@ -35,3 +43,20 @@ class FileMetadata(Base):
 
 
 hash_sum_index = Index("ix_hash_sum", FileMetadata.hash_sum)
+
+MetadataSchema = StructType(
+    [
+        StructField("path", StringType(), False),
+        StructField("size", IntegerType(), False),
+        StructField("type", StringType(), True),  # Use StringType for SQLAlchemyEnum
+        StructField(
+            "architecture", StringType(), False
+        ),  # Use StringType for SQLAlchemyEnum
+        StructField("number_of_imports", IntegerType(), False),
+        StructField("number_of_exports", IntegerType(), False),
+        StructField("hash_sum", StringType(), False),
+        StructField(
+            "malicious_type", StringType(), False
+        ),  # Use StringType for SQLAlchemyEnum
+    ]
+)
