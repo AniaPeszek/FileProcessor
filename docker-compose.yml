@@ -13,6 +13,7 @@ services:
       - db
     volumes:
       - streaming_data:/stream
+      - uploads:/uploads
   db:
     image: postgres:15
     volumes:
@@ -38,3 +39,4 @@ services:
 volumes:
   postgres_data:
   streaming_data:
+  uploads:

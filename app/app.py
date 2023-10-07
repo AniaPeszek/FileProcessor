@@ -5,6 +5,7 @@ import os
 import random
 import string
 
+import pandas as pd
 from flask import Flask, request, jsonify
 
 from paths_df import PathsDataFrame
@@ -12,8 +13,6 @@ from paths_df import PathsDataFrame
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-SPARK_SERVICE_URL = os.getenv("SPARK_SERVICE_URL")
 
 paths_to_safe_files = PathsDataFrame(is_safe=True)
 paths_to_malware = PathsDataFrame(is_safe=False)
@@ -39,7 +38,7 @@ def process_files():
             )
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
             batch_df.to_csv(
-                f"/stream/file_list_{timestamp}_{random_string}.csv",
+                f"/stream/path_list_{timestamp}_{random_string}.csv",
                 index=False,
                 header=False,
             )
@@ -50,6 +49,47 @@ def process_files():
     except Exception as e:
         logger.error(e)
         return jsonify({"error": f"{str(e)}"}), 500
+
+
+@app.route("/upload", methods=["POST"])
+def upload_txt_file():
+    """
+    In file should be only links to files, one per line. The same vales that are in "href" attribute in data source.
+    """
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No file part in the request."}), 400
+
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No file selected."}), 400
+
+        if file:
+            if not os.path.splitext(file.filename)[1] == ".txt":
+                return jsonify({"error": "Invalid file extension."}), 400
+            file.save(f"/uploads/{file.filename}")
+            task = create_task_from_file(f"/uploads/{file.filename}")
+            return (
+                jsonify({"message": f"File uploaded successfully. Task size: {task}"}),
+                200,
+            )
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": f"{str(e)}"}), 500
+
+
+def create_task_from_file(filepath: str) -> int:
+    with open(filepath, "r") as file:
+        lines = file.readlines()
+    batch_df = pd.DataFrame({"path": lines})
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    random_string = "".join(random.choice(string.ascii_letters) for _ in range(5))
+    batch_df.to_csv(
+        f"/stream/path_list_{timestamp}_{random_string}.csv",
+        index=False,
+        header=False,
+    )
+    return batch_df.shape[0]
 
 
 if __name__ == "__main__":

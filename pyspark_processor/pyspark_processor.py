@@ -61,7 +61,7 @@ def process_file(row):
     logger.debug(f"Processing file {row['path']}")
     metadata = get_metadata(DATA_SOURCE_PATH, row["path"])
     if metadata.get("warning"):
-        logger.error(metadata.get("warning"))
+        logger.warning(metadata.get("warning"))
         return
     logger.info(metadata)
     result = save_metadata(metadata)

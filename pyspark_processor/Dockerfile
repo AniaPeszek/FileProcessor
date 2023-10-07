@@ -19,8 +19,6 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY . .
-#RUN mkdir /tmp
-#MOUNT --type=tmpfs --tmpfs-size=500MB --destination=/tmp /tmp
 
 EXPOSE 5001
 # run server

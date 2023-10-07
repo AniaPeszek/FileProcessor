@@ -1,5 +1,5 @@
 beautifulsoup4==4.12.2 ; python_version >= "3.10" and python_version < "3.13"
-blinker==1.6.2 ; python_version >= "3.10" and python_version < "3.13"
+blinker==1.6.3 ; python_version >= "3.10" and python_version < "3.13"
 certifi==2023.7.22 ; python_version >= "3.10" and python_version < "3.13"
 charset-normalizer==3.3.0 ; python_version >= "3.10" and python_version < "3.13"
 click==8.1.7 ; python_version >= "3.10" and python_version < "3.13"
