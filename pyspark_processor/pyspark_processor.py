@@ -4,17 +4,15 @@ import tempfile
 
 import pefile
 import requests
-from bs4 import BeautifulSoup
-from flask import Flask, request, jsonify
 from pyspark.conf import SparkConf
 from pyspark.sql import SparkSession, Row
+from pyspark.sql.types import StructType, StructField, StringType
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from file import File
 from models import Base, MetadataSchema
 
-app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -54,43 +52,22 @@ PROPERTIES = {
 }
 TABLE_NAME = "files_metadata"
 DATA_SOURCE_PATH = os.getenv("DATA_SOURCE_PATH")
-CLEAN_FILES_URL = DATA_SOURCE_PATH + "/0/00Tree.html"
-MALWARE_FILES_URL = DATA_SOURCE_PATH + "/1/00Tree.html"
+
+schema = StructType([StructField("path", StringType(), True)])
+stream = spark.readStream.option("sep", ",").schema(schema).csv("/stream")
 
 
-@app.route("/process_files", methods=["POST"])
-def process_files():
-    try:
-        n = int(request.json.get("n"))
-        logger.debug(f"Files to process: {n}")
-        file_list = list_all_files(CLEAN_FILES_URL)
-
-        # TODO: to change
-        for i in range(n):
-            logger.debug(f"Processing file {file_list[i]}")
-            metadata = get_metadata(DATA_SOURCE_PATH, file_list[i])
-            if metadata.get("warning"):
-                logger.debug("skip")
-                continue
-            logger.debug(metadata)
-            result = save_metadata(metadata)
-            logger.debug(f"result {result}")
-            if "error" in result:
-                return jsonify({"error": result["error"]}), 500
-        return jsonify({"message": f"Processed {n} files successfully."}), 200
-    except Exception as e:
-        return jsonify({"error": {str(e)}}), 400
-
-
-# TODO: change to stream
-def list_all_files(url: str) -> list:
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "html.parser")
-        links = soup.find_all("a")
-        offset = 2  # skip first two links - there are links to dir and parent dir
-        return [link.get("href") for link in links if link.get("href")][offset:]
-    return []
+def process_file(row):
+    logger.debug(f"Processing file {row['path']}")
+    metadata = get_metadata(DATA_SOURCE_PATH, row["path"])
+    if metadata.get("warning"):
+        logger.error(metadata.get("warning"))
+        return
+    logger.info(metadata)
+    result = save_metadata(metadata)
+    logger.info(f"result {result}")
+    if "error" in result:
+        logger.error(result["error"])
 
 
 def is_file_in_db(path: str) -> bool:
@@ -121,7 +98,7 @@ def get_metadata(url: str, path: str) -> dict:
                     logger.error(f"Error parsing {path}: {str(e)}")
                     return {"warning": f"parsing error"}
 
-            file = File(pe, url + path)
+            file = File(pe, url + path, is_malicious=path[1] == "1")
             if file.architecture:
                 return file.get_metadata()
             return {"warning": "architecture not in scope"}
@@ -157,5 +134,13 @@ def save_metadata(metadata: dict) -> dict:
             return {"error": f"Error saving metadata: {str(e)}"}
 
 
+def foreach_batch_function(df, _):
+    batch_df = df.select("path")
+    paths = batch_df.collect()
+    for path in paths:
+        process_file(path)
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    query = stream.writeStream.foreachBatch(foreach_batch_function).start()
+    spark.streams.awaitAnyTermination()

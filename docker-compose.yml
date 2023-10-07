@@ -11,6 +11,8 @@ services:
       - ./.env
     depends_on:
       - db
+    volumes:
+      - streaming_data:/stream
   db:
     image: postgres:15
     volumes:
@@ -30,6 +32,9 @@ services:
     ports:
       - "4040:4040"  # Spark UI port (if needed)
       - "5001:5001"  # Flask API port
+    volumes:
+      - streaming_data:/stream
 
 volumes:
   postgres_data:
+  streaming_data:

@@ -3,13 +3,14 @@ from models import ArchitectureType, MaliciousType
 
 
 class File:
-    def __init__(self, pe: pefile.PE, path: str):
+    def __init__(self, pe: pefile.PE, path: str, is_malicious: bool):
         self.pe = pe
         self.path = path
         self.size = pe.OPTIONAL_HEADER.SizeOfImage
         self.architecture = self.get_file_architecture()
         self.number_of_imports = self.get_number_of_imports()
         self.number_of_exports = self.get_number_of_exports()
+        self.is_malicious = is_malicious
 
     def get_metadata(self) -> dict:
         return {
@@ -20,7 +21,7 @@ class File:
             "number_of_imports": self.number_of_imports,
             "number_of_exports": self.number_of_exports,
             "malicious_type": MaliciousType.malicious.value
-            if self.path[1] == "1"
+            if self.is_malicious
             else MaliciousType.clean.value,
         }
 

@@ -18,8 +18,8 @@ beautifulsoup4 = {version = "^4.12.2", optional = true}
 pefile = {version = "^2023.2.7", optional = true}
 
 [tool.poetry.extras]
-app = ["flask", "sqlalchemy", "requests"]
-pyspark_processor = ["pyspark", "flask", "sqlalchemy", "pandas", "beautifulsoup4", "requests", "pefile"]
+app = ["flask", "sqlalchemy", "requests", "pandas", "beautifulsoup4"]
+pyspark_processor = ["pyspark", "sqlalchemy", "pandas", "pefile", "requests"]
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
