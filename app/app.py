@@ -79,7 +79,7 @@ def upload_txt_file():
 
 
 def create_task_from_file(filepath: str) -> int:
-    with open(filepath, "r") as file:
+    with open(filepath) as file:
         lines = file.readlines()
     batch_df = pd.DataFrame({"path": lines})
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")

@@ -25,6 +25,14 @@ Session = sessionmaker(bind=engine)
 # Create the database tables
 Base.metadata.create_all(engine)
 
+PROPERTIES = {
+    "user": os.environ.get("SQL_USER"),
+    "password": os.environ.get("SQL_PASSWORD"),
+    "driver": "org.postgresql.Driver",
+    "stringtype": "unspecified",
+}
+TABLE_NAME = "files_metadata"
+DATA_SOURCE_PATH = os.getenv("DATA_SOURCE_PATH")
 JDBC_URL = f"jdbc:postgresql://db:5432/{os.environ.get('SQL_DATABASE')}"
 spark_conf = (
     SparkConf()
@@ -44,17 +52,13 @@ spark_conf = (
 spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
 spark.sparkContext.setLogLevel("INFO")
 
-PROPERTIES = {
-    "user": os.environ.get("SQL_USER"),
-    "password": os.environ.get("SQL_PASSWORD"),
-    "driver": "org.postgresql.Driver",
-    "stringtype": "unspecified",
-}
-TABLE_NAME = "files_metadata"
-DATA_SOURCE_PATH = os.getenv("DATA_SOURCE_PATH")
-
 schema = StructType([StructField("path", StringType(), True)])
-stream = spark.readStream.option("sep", ",").schema(schema).csv("/stream")
+stream = (
+    spark.readStream.option("sep", ",")
+    .option("cleanSource", "delete")
+    .schema(schema)
+    .csv("/stream")
+)
 
 
 def process_file(row):

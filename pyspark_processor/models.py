@@ -6,7 +6,7 @@ from pyspark.sql.types import (
     StringType,
     IntegerType,
 )
-from sqlalchemy import Column, Integer, String, Enum as SQLAlchemyEnum, Index
+from sqlalchemy import Column, Integer, String, Enum as SQLAlchemyEnum
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()

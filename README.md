@@ -1,0 +1,10 @@
+# File Processor
+### Description
+This is an application that download files from a given URL,
+process them and upload the file metadata to the postgres database.
+
+### Simplified sequence diagrams
+
+![sequence_1](http://plantuml.com/plantuml/svg/TP713e8m38RlUug-W3u01nCDyMn2z5v7KS9WSoqclhqR1jYYxhRzN_-_xL2BzN1cyigXbrQt3WU1eq7kziwfnqWZGIMUiBzOC_QKSQSNX-j4rYXuHIOe3nbIXlVAZbwJYZ6msItk1JXlDJ7304rhYDMiH6ejBE16CX5Wsg5ZjKgvNOAaJcdx1KWGjfgV6H9R-qYW0onKgtMsRu_Op-AJIX5T2vCmOws39koQKD-dHXM4auVy6dd2ye7JW3zEAJ8l-L_eeG369q5FWl4N5Gtr6m00)
+
+![sequence_2](http://www.plantuml.com/plantuml/svg/TP5D3i8W48Ntd68ke0VemiIcSMrYT3_IgJRIWZ1jzFP26mlumuA4UH_l3GDArXQEZgmmQBcLhS6UOQVGtRR6YFj00y61BM5tqcheAEFsJ-UF4raZunaTGLLcIENh1prOIIB4m6gpk1TWh9Ra73Ij8hzRtG4_MBo10AVP1R0NrjAD6H9yPmcaXvbg4HlxzhWGHvzK2cYyc8GfhGqqVb24yZerAy2lF2G-T8vOi2Xy1lnnIf5qGhz2om8SZWGTCOOl4DJNBm00)

@@ -1,0 +1,19 @@
+@startuml
+actor User
+participant FlaskApp
+queue StreamVolume
+participant PysparkApp
+database DB
+participant DataSource
+User -> FlaskApp: process files from txt
+FlaskApp -> StreamVolume: task.csv
+FlaskApp -> User: task created
+PysparkApp -> StreamVolume: get task.csv
+StreamVolume -> PysparkApp: task.csv
+loop for each file
+    PysparkApp -> DataSource: get file
+    DataSource -> PysparkApp: file
+    PysparkApp -> PysparkApp: process file
+    PysparkApp -> DB: save metadata
+end
+@enduml
